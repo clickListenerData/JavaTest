@@ -1,0 +1,53 @@
+##### 公共 配置 #######
+
+#内置Tomcat容器配置
+server:
+  port: 1111
+
+#基础配置
+spring:
+
+  #打印SQL
+  jpa:
+    show-sql: true
+
+  #数据库配置
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/test_login?serverTimezone=GMT%2B8&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jackson:
+      #日期格式化
+      date-format: yyyy-MM-dd HH:mm:ss
+      time-zone: GMT+8
+      serialization:
+        #格式化输出
+        indent_output: true
+        #忽略无法转换的对象
+        fail_on_empty_beans: false
+      #设置空如何序列化
+      defaultPropertyInclusion: NON_EMPTY
+      deserialization:
+        #允许对象忽略json中不存在的属性
+        fail_on_unknown_properties: false
+      parser:
+        #允许出现特殊字符和转义符
+        allow_unquoted_control_chars: true
+        #允许出现单引号
+        allow_single_quotes: true
+
+  mail:
+    host: smtp.163.com
+    username: huaixianzhong1314@163.com
+    password: LRMSQPIOEXBWJAEI
+    port: 465
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          socketFactory:
+            class: java.net.ssl.SSLSocketFactory
+      from: hxz_server@163.com
+    protocol: smtps

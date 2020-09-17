@@ -31,6 +31,6 @@ public class CustomExceptionHandler {
     @ExceptionHandler(value = Exception.class)  // 可以处理 除了 404 以外的异常
     @ResponseBody
     public Result<Object> handlerException(Exception e) {
-        return Result.custom(1000,e.getMessage(),null);
+        return Result.custom(1000,e.getMessage(),e);
     }
 }

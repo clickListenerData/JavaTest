@@ -11,6 +11,10 @@ spring:
   jpa:
     show-sql: true
 
+  #修改thymeleaf访问根路径
+  thymeleaf:
+    prefix: classpath:/view/
+
   #数据库配置
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/test_login?serverTimezone=GMT%2B8&characterEncoding=utf-8&useSSL=false

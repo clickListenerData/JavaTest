@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>home</title>
+    <script th:replace="common/head::static"></script>
+    <!--<link href="../static/common/layui/css/layui.css" rel="stylesheet"/>
+    <script src="../static/common/layui/layui.js"></script>-->
+</head>
+<body class="layui-layout-body">
+    <div class="layui-layout-admin">
+        <div class="layui-header">
+            <div class="layui-logo">测试 系统</div>
+            <ul class="layui-nav layui-layout-left">
+                <li class="layui-nav-item"><a class="hxz-menu" data-url="/sys/test" data-id="kzt" href="javascript:;">控制台</a></li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">其它</a>
+                    <dl class="layui-nav-child">
+                        <dd><a class="hxz-menu" data-url="/sys/upload" data-id="upload" href="javascript:;">文件上传</a></dd>
+                        <dd><a class="hxz-menu" data-url="https://www.baidu.com" data-id="baidu" href="javascript:;">百度</a></dd>
+                    </dl>
+                </li>
+            </ul>
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">
+                        <img src="common/layui/images/face/3.gif">
+                        name
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd><a class="hxz-menu" data-url="/sys/userInfo" data-id="users" href="javascript:;">用户列表</a></dd>
+                        <dd><a class="hxz-menu" data-url="/sys/test" data-id="set" href="javascript:;">安全设置</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="/logout">退出</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <ul class="layui-nav layui-nav-tree" lay-id="nav">
+                        <div th:each="menu,stat: ${menus}">
+                            <li class="layui-nav-item">
+                                <a th:text="${menu.getName()}">XXX</a>
+                                <dl class="layui-nav-child" th:each="menuc,stat: ${menu.children}">
+                                    <dd>
+                                        <a class="hxz-menu" data-url="/sys/editor" data-id="editor" href="javascript:;" th:text="${menuc.getName()}">XXX</a>
+                                    </dd>
+                                </dl>
+                            </li>
+                        </div>
+                </ul>
+            </div>
+        </div>
+
+        <div class="layui-body" style="overflow-y: hidden;">  <!--裁剪内容 不提供滚动机制-->
+            <div class="layui-tab"  lay-filter="demo" lay-allowclose="true">
+                <ul class="layui-tab-title">
+                    <li class="layui-this" lay-id="11">首页</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-row layui-col-space12">
+                            <div class="layui-col-md12">
+                                <div class="layui-card">
+                                    首页
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-footer">
+            @ XXX系统
+        </div>
+    </div>
+<script>
+    layui.use('element',function () {
+        let element = layui.element;
+        $("body").on("click", ".hxz-menu",function () {
+            let val = $(this).text()
+            let url = $(this).data('url')
+            let id = $(this).data('id')
+
+            if ($(".layui-tab-title").find("li[lay-id='" + id + "']").length <= 0) {
+                let height = document.documentElement.clientHeight - 160 + "px";
+                element.tabAdd('demo',{
+                    title:val,
+                    id:id,
+                    content:"<iframe onload='$(this)[0].height = document.documentElement.clientHeight - 160' width='100%' height='" + height + "' frameborder='0' scrolling='auto' src=\"" + url + "\"></iframe>"
+                })
+            }
+            element.tabChange('demo',id)
+        });
+    });
+</script>
+</body>
+</html>

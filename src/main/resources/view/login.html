@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+    <!-- 引入公用部分 -->
+    <script th:replace="common/head::static"></script>
+    <style>
+        .main{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <h3 style="text-align: center" th:text="${test}">登录</h3>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">账号<i class="layui-icon layui-icon-username"></i></label>
+                <div class="layui-input-block">
+                    <input type="text" name="user_name" id="user_name" class="layui-input" placeholder="请输入账号">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码<i class="layui-icon layui-icon-password"></i></label>
+                <div class="layui-input-block">
+                    <input type="text" name="password" id="password" class="layui-input" placeholder="请输入密码">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <a class="layui-btn" onclick="login()">登录</a>
+                    <button type="reset" name="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    window.onload = function () {
+        let data = layui.data('user');
+        console.log(data.refresh_token)
+        if (data.refresh_token != null) {
+            $.ajax(ctx + "/user/get_user",{
+                type:'post',
+                headers:{token:data.refresh_token},
+                success:function (data) {
+                    if (data.code === 200) {
+                        window.location.href = "index";
+                    }
+                }
+            });
+        }
+    }
+
+    function login() {
+        $.post(ctx + "/user/login",{
+            userName:$("#user_name").val(),
+            password:$("#password").val()
+        },function (data,status) {
+            layui.use('layer',function () {
+                var layer = layui.layer
+                if (data.code === 200) {
+                    layui.data('user',{
+                        key:'access_token',
+                        value:data.data.access_token,
+                        key:'refresh_token',
+                        value:data.data.refresh_token
+                    });
+                    window.location.href = "index";
+                } else  {
+                    layer.msg(data.message,{icon:2,time:1000},function () {});
+                }
+            })
+            // alert(data.message)
+            // window.location.href = "index"  // 重新定向到 index 页
+            // window.open("index")
+        })
+    }
+</script>
+</html>

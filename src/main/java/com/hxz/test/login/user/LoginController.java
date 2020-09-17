@@ -2,6 +2,7 @@ package com.hxz.test.login.user;
 
 import com.hxz.test.login.bean.Login;
 import com.hxz.test.login.common.Result;
+import com.hxz.test.login.menu.pojo.SysMenuInfo;
 import com.hxz.test.login.user.service.UserService;
 import com.hxz.test.login.user.service.UserServiceImpl;
 import com.hxz.test.login.user.vo.UserVo;
@@ -19,12 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,7 +35,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/user/")
 @Slf4j
 public class LoginController {
 
@@ -45,7 +48,7 @@ public class LoginController {
     private ResourceBundle bundle;
 
     @RequestMapping(value = "login",method = RequestMethod.POST)
-    public Result<Login> login(@RequestParam("userName") String userName, @RequestParam("password") String password) {
+    public Result<Login> login(@RequestParam("userName") String userName, @RequestParam("password") String password,HttpSession session) {
         // sql  user pwd  userId
         // userId token
         // ?token
@@ -54,6 +57,8 @@ public class LoginController {
             return Result.custom(100,"用户不存在",null);
         }else {
             if (userVo.getPassword().equals(password)) {
+                log.error("session id::" + session.getId());
+                session.setAttribute("login",userVo.getUserId());  // 用于前端登录  定位用户
                 return Result.success(JwtSignUtils.sign(userVo.getUserId()));
             } else {
                 return Result.custom(101, "密码错误", null);
@@ -72,10 +77,11 @@ public class LoginController {
     }
 
     @PostMapping("get_user")
-    public Result<UserVo> getUser(HttpServletRequest request) {
+    public Result<UserVo> getUser(HttpServletRequest request,HttpSession session) {
         String token = request.getHeader("token");
         if (JwtSignUtils.verify(token)) {
             String userId = JwtSignUtils.getUserId(token);
+            session.setAttribute("login",userId);  // 用于前端登录  定位用户
             return userService.get(userId);
         } else  {
             return Result.custom(102,"token error",null);
@@ -112,11 +118,13 @@ public class LoginController {
     }
 
     @GetMapping("test")
-    public Result<String> test(HttpServletResponse response) {
-//        response.addHeader("token","123456");
-//        Result<List<UserVo>> list = userService.list();
-//        return list;
-        throw new RuntimeException("custom error");
+    public Result<List<UserVo>> test(HttpServletRequest request,HttpServletResponse response) {
+        String token = request.getHeader("token");
+        log.error(token);
+        response.addHeader("token","123456");
+        Result<List<UserVo>> list = userService.list();
+        return list;
+//        throw new RuntimeException("custom error");
         /*String s = "";
         try {
             byte[] bytes = bundle.getString("hello").getBytes("ISO-8859-1");
@@ -192,7 +200,7 @@ public class LoginController {
             }*/
             return Result.custom(100,"成功","data");
         }
-        return Result.error("");
+        return Result.error("上传出错");
     }
 
     private String uploadFile(MultipartFile file) throws Exception {
